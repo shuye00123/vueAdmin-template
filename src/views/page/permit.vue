@@ -1,71 +1,89 @@
 <template>
   <div class="app-container">
-    <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="Activity name">
-        <el-input v-model="form.name"></el-input>
+    <el-form :model="form" :rules="permitRules" ref="form" label-width="100px">
+      <el-form-item label="车牌号码" prop="platenum">
+        <el-input name="platenum" v-model="form.platenum"></el-input>
       </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="form.region" placeholder="please select your zone">
-          <el-option label="Zone one" value="shanghai"></el-option>
-          <el-option label="Zone two" value="beijing"></el-option>
+      <el-form-item label="放行规则" prop="merRuleid">
+        <el-select v-model="form.merRuleid" value-key="id" placeholder="选择放行规则">
+          <el-option name="merRuleid" v-for="rule in ruleList" :key="rule.id" :value="rule.id" :label="rule.rule"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="Activity time">
-        <el-col :span="11">
-          <el-date-picker type="date" placeholder="Pick a date" v-model="form.date1" style="width: 100%;"></el-date-picker>
-        </el-col>
-        <el-col class="line" :span="2">-</el-col>
-        <el-col :span="11">
-          <el-time-picker type="fixed-time" placeholder="Pick a time" v-model="form.date2" style="width: 100%;"></el-time-picker>
-        </el-col>
+      <el-form-item label="放行原因" prop="reasonid">
+        <el-select v-model="form.reasonid" value-key="id" placeholder="选择放行原因">
+          <el-option name="reasonid" v-for="reason in reasonList" :key="reason.id" :value="reason.id" :label="reason.reason"></el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="Instant delivery">
-        <el-switch on-text="" off-text="" v-model="form.delivery"></el-switch>
-      </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type"></el-checkbox>
-          <el-checkbox label="Promotion activities" name="type"></el-checkbox>
-          <el-checkbox label="Offline activities" name="type"></el-checkbox>
-          <el-checkbox label="Simple brand exposure" name="type"></el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor"></el-radio>
-          <el-radio label="Venue"></el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input type="textarea" v-model="form.desc"></el-input>
+      <el-form-item label="备注">
+        <el-input type="textarea" v-model="form.remark"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">Create</el-button>
-        <el-button>Cancel</el-button>
+        <el-button type="primary" @click="onSubmit">放行</el-button>
+        <el-button>取消</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
+import { isValidPlate } from '@/utils/validate'
+import { mapGetters } from 'vuex'
+
 export default {
+  computed: {
+    ...mapGetters([
+      'ruleList',
+      'reasonList'
+    ])
+  },
   data() {
+    const validatePlate = (rule, value, callback) => {
+      if (!isValidPlate(value)) {
+        callback(new Error('请输入正确的车牌号'))
+      } else {
+        callback()
+      }
+    }
+    const validateRuleid = (rule, value, callback) => {
+      if (value == null) {
+        callback(new Error('请选择放行规则'))
+      } else {
+        callback()
+      }
+    }
+    const validateReasonid = (rule, value, callback) => {
+      if (value == null) {
+        callback(new Error('请选择放行原因'))
+      } else {
+        callback()
+      }
+    }
     return {
       form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        platenum: '',
+        merRuleid: null,
+        reasonid: null,
+        remark: ''
+      },
+      permitRules: {
+        platenum: [{ required: true, trigger: 'blur', validator: validatePlate }],
+        merRuleid: [{ required: true, trigger: 'blur', validator: validateRuleid }],
+        reasonid: [{ required: true, trigger: 'blur', validator: validateReasonid }],
       }
     }
   },
   methods: {
     onSubmit() {
-      this.$message('submit!')
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.$store.dispatch('AddPermit', this.form).then((response) => {
+          }).catch(() => {
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     }
   }
 }

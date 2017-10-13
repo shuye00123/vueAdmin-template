@@ -6,6 +6,11 @@ export function isvalidUsername(str) {
   const userReg = /^[0-9A-Za-z\u4e00-\u9fa5]+$/
   return userReg.test(str)
 }
+/* 合法车牌*/
+export function isValidPlate(str) {
+  const plateReg = /^[\u4e00-\u9fa5]{1}[a-zA-Z]{1}[a-zA-Z_0-9]{5}$/
+  return plateReg.test(str)
+}
 
 /* 合法uri*/
 export function validateURL(textval) {

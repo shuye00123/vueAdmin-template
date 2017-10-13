@@ -39,6 +39,7 @@ const user = {
         const resp = response.data
         setToken(resp)
         commit('SET_TOKEN', resp)
+        resolve(response)
       }
 
       if (userInfo.from === 0) {

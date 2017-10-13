@@ -12,6 +12,7 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' })
     } else {
       if (store.getters.roles.length === 0) {
+        store.dispatch('GetRule').then(() => {}).catch(() => {})
         store.dispatch('GetInfo').then(res => {
           // const roles = res.data.role
           const roles = store.getters.roles
