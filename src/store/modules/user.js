@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/login'
+import { login, wxlogin, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -6,6 +6,8 @@ const user = {
     token: getToken(),
     name: '',
     avatar: '',
+    balance: 0,
+    type: '',
     roles: []
   },
 
@@ -19,6 +21,12 @@ const user = {
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
     },
+    SET_BALANCE: (state, balance) => {
+      state.balance = balance
+    },
+    SET_TYPE: (state, type) => {
+      state.type = type
+    },
     SET_ROLES: (state, roles) => {
       state.roles = roles
     }
@@ -27,27 +35,42 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
-      return new Promise((resolve, reject) => {
-        login(username, userInfo.password).then(response => {
-          const data = response.data
-          setToken(data.token)
-          commit('SET_TOKEN', data.token)
-          resolve()
-        }).catch(error => {
-          reject(error)
+      function loginRespHandler(response, resolve) {
+        const resp = response.data
+        setToken(resp)
+        commit('SET_TOKEN', resp)
+      }
+
+      if (userInfo.from === 0) {
+        const username = userInfo.username.trim()
+        return new Promise((resolve, reject) => {
+          login(username, userInfo.password, userInfo.from).then(response => {
+            loginRespHandler(response, resolve)
+          }).catch(error => {
+            reject(error)
+          })
         })
-      })
+      } else {
+        return new Promise((resolve, reject) => {
+          wxlogin(userInfo.code, userInfo.from).then(response => {
+            loginRespHandler(response, resolve)
+          }).catch(error => {
+            reject(error)
+          })
+        })
+      }
     },
 
     // 获取用户信息
-    GetInfo({ commit, state }) {
+    GetInfo({ commit }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
+        getInfo().then(response => {
           const data = response.data
-          commit('SET_ROLES', data.role)
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
+          commit('SET_ROLES', ['admin'])
+          commit('SET_NAME', data.mer_name)
+          commit('SET_BALANCE', data.balance)
+          commit('SET_TYPE', data.type)
+          commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -56,9 +79,9 @@ const user = {
     },
 
     // 登出
-    LogOut({ commit, state }) {
+    LogOut({ commit }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        logout().then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           removeToken()

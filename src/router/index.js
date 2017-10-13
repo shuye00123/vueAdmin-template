@@ -22,7 +22,7 @@ export const constantRouterMap = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
-    name: 'Dashboard',
+    name: '首页',
     hidden: true,
     children: [{ path: 'dashboard', component: _import('dashboard/index') }]
   }
@@ -36,13 +36,14 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
-    path: '/example',
+    path: '/function',
     component: Layout,
     redirect: 'noredirect',
-    name: 'Example',
+    name: '功能',
     icon: 'zujian',
     children: [
-      { path: 'index', name: 'Form', icon: 'zonghe', component: _import('page/form') }
+      { path: 'permit', name: '放行', icon: 'zonghe', component: _import('page/permit') },
+      { path: 'recharge', name: '充值', icon: 'zonghe', component: _import('page/recharge') }
     ]
   },
 
@@ -52,7 +53,7 @@ export const asyncRouterMap = [
     redirect: '/table/index',
     icon: 'tubiao',
     noDropdown: true,
-    children: [{ path: 'index', name: 'Table', component: _import('table/index'), meta: { role: ['admin'] }}]
+    children: [{ path: 'index', name: '放行记录', component: _import('table/index'), meta: { role: ['admin'] }}]
   },
 
   { path: '*', redirect: '/404', hidden: true }

@@ -1,27 +1,39 @@
 import fetch from '@/utils/fetch'
 
-export function login(username, password) {
+export function login(username, password, from) {
   return fetch({
-    url: '/user/login',
+    url: '/login',
     method: 'post',
     data: {
       username,
-      password
+      password,
+      from
     }
   })
 }
 
-export function getInfo(token) {
+export function wxlogin(code, from) {
+  return fetch({
+    url: '/login',
+    method: 'post',
+    data: {
+      code,
+      from
+    }
+  })
+}
+
+export function getInfo() {
   return fetch({
     url: '/user/info',
-    method: 'get',
-    params: { token }
+    method: 'get'
+    // params: {  }
   })
 }
 
 export function logout() {
   return fetch({
-    url: '/user/logout',
-    method: 'post'
+    url: '/logout',
+    method: 'get'
   })
 }

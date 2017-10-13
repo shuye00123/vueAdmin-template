@@ -29,7 +29,7 @@
 
 <script>
 import { isvalidUsername } from '@/utils/validate'
-
+import param from '@/utils/getParam'
 export default {
   name: 'login',
   data() {
@@ -41,16 +41,18 @@ export default {
       }
     }
     const validatePass = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('密码不能小于6位'))
+      if (value.length < 4) {
+        callback(new Error('密码不能小于4位'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: '',
+        code: '',
+        from: 0
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -59,7 +61,32 @@ export default {
       loading: false
     }
   },
+  created() {
+    var params = param()
+    if (params && params.code) {
+      this.loginForm.code = param().code
+    }
+  },
   methods: {
+    loginWay() {
+      var userAgent = window.navigator.userAgent
+      console.log(userAgent)
+      if (userAgent.indexOf('MicroMessenger') !== -1) {
+        this.loginForm.from = 1
+        if (!this.loginForm.code) {
+          this.getCode()
+        } else {
+          this.submit()
+        }
+      }
+    },
+    getCode() {
+      var href = window.location.href
+      var wechatRedirect = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + process.env.APPID +
+        '&redirect_uri=' + href + '&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'
+      console.log(wechatRedirect)
+      window.location.replace(wechatRedirect)
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
