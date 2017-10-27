@@ -21,8 +21,6 @@
           登录
         </el-button>
       </el-form-item>
-      <div class='tips'>账号:admin 密码随便填</div>
-      <div class='tips'>账号:editor  密码随便填</div>
     </el-form>
   </div>
 </template>
@@ -52,7 +50,7 @@ export default {
         username: '',
         password: '',
         code: '',
-        from: 0
+        from: 2
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -66,25 +64,29 @@ export default {
     if (params && params.code) {
       this.loginForm.code = param().code
     }
+    this.loginWay()
   },
   methods: {
     loginWay() {
       var userAgent = window.navigator.userAgent
-      console.log(userAgent)
       if (userAgent.indexOf('MicroMessenger') !== -1) {
-        this.loginForm.from = 1
+        this.loginForm.from = 0
         if (!this.loginForm.code) {
           this.getCode()
         } else {
-          this.submit()
+          this.$store.dispatch('Login', this.loginForm).then(() => {
+            this.loading = false
+            this.$router.push({ path: '/' })
+          }).catch(() => {
+            this.loading = false
+          })
         }
       }
     },
     getCode() {
       var href = window.location.href
-      var wechatRedirect = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + process.env.APPID +
-        '&redirect_uri=' + href + '&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'
-      console.log(wechatRedirect)
+      var wechatRedirect = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + process.env.APPID + '&redirect_uri=' + href + '&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect'
+      // console.log(wechatRedirect)
       window.location.replace(wechatRedirect)
     },
     handleLogin() {

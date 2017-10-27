@@ -1,5 +1,5 @@
 module.exports = {
   NODE_ENV: '"production"',
-  BASE_API: '"https://easy-mock.com/mock/5950a2419adc231f356a6636/vue-admin"',
-  APPID: '"abcdefg"'
+  BASE_API: '"http://weixin.xiaobotech.com:8848"',
+  APPID: '"wx4ca0dd6d16aa6895"'
 }

@@ -8,7 +8,8 @@ const user = {
     avatar: '',
     balance: 0,
     type: '',
-    roles: []
+    roles: [],
+    source: 0
   },
 
   mutations: {
@@ -29,24 +30,28 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_FROM: (state, source) => {
+      state.source = source
     }
   },
 
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      function loginRespHandler(response, resolve) {
+      function loginRespHandler(userInfo, response, resolve) {
         const resp = response.data
         setToken(resp)
         commit('SET_TOKEN', resp)
+        commit('SET_FROM', userInfo.from)
         resolve(response)
       }
 
-      if (userInfo.from === 0) {
+      if (userInfo.from === 2) {
         const username = userInfo.username.trim()
         return new Promise((resolve, reject) => {
           login(username, userInfo.password, userInfo.from).then(response => {
-            loginRespHandler(response, resolve)
+            loginRespHandler(userInfo, response, resolve)
           }).catch(error => {
             reject(error)
           })
@@ -54,7 +59,7 @@ const user = {
       } else {
         return new Promise((resolve, reject) => {
           wxlogin(userInfo.code, userInfo.from).then(response => {
-            loginRespHandler(response, resolve)
+            loginRespHandler(userInfo, response, resolve)
           }).catch(error => {
             reject(error)
           })

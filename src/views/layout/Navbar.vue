@@ -23,7 +23,6 @@
 import { mapGetters } from 'vuex'
 import Levelbar from './Levelbar'
 import Hamburger from '@/components/Hamburger'
-
 export default {
   components: {
     Levelbar,
@@ -94,4 +93,3 @@ export default {
         }
     }
 </style>
-
